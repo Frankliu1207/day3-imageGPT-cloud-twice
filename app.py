@@ -2,9 +2,10 @@ from flask import Flask,request,render_template
 import json
 import time
 import requests
+import os
 
 headers={
-    "Authorization" : "Token REMOVED_EXPOSED_REPLICATE_TOKEN",
+    "Authorization" : "Token " + os.environ.get("REPLICATE_API_TOKEN", ""),
     "Content-Type" : "application/json"
 }
 
@@ -13,6 +14,8 @@ app = Flask(__name__)
 @app.route("/",methods=["GET","POST"])
 def index():
     if request.method == "POST":
+        if not os.environ.get("REPLICATE_API_TOKEN"):
+            return "Image generation is not configured: missing REPLICATE_API_TOKEN.", 503
         q = request.form.get("q")
         data = json.dumps(
             {
